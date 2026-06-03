@@ -79,6 +79,28 @@ npx react-native run-android
 ```
 *Note: To generate a release APK for Android, run `./gradlew assembleRelease` inside the `android/` directory.*
 
+## 🛠 Troubleshooting
+
+If you encounter errors during the Android build process, here are the most common solutions:
+
+### 1. "Gradle requires JVM 17 or later to run" Error
+- **Cause:** Your system is using an older Java version (e.g., Java 8).
+- **Solution:** Install [Microsoft OpenJDK 17](https://aka.ms/download-jdk/microsoft-jdk-17-windows-x64.msi). Then, update your `JAVA_HOME` environment variable to point to the new JDK 17 installation path (e.g., `C:\Program Files\Microsoft\jdk-17.0.11.9-hotspot\`). Alternatively, if you have Android Studio installed, you can point `JAVA_HOME` to its bundled Java runtime (`C:\Program Files\Android\Android Studio\jbr`).
+
+### 2. "'adb' is not recognized as an internal or external command" Error
+- **Cause:** Android SDK platform tools are not in your system's PATH.
+- **Solution:** Open your Windows Environment Variables, find the `Path` (or `PATH`) variable under "User variables", and add the path to your Android SDK `platform-tools` folder. By default, it is usually located at `C:\Users\<YourUsername>\AppData\Local\Android\Sdk\platform-tools`.
+
+**Important:** After making any changes to your Environment Variables, you must completely restart your terminal or IDE (e.g., VSCode, WebStorm) for the changes to take effect.
+
+### 3. Device Not Showing in 'adb devices' (USB Debugging Issues)
+If you run `adb devices` in your command prompt or terminal and your device doesn't show up (or shows as "unauthorized"), follow these steps carefully:
+- **Enable Developer Options:** Go to your phone's **Settings > About Phone**, and tap on **"Build Number"** 7 times until you see a message saying "You are now a developer!".
+- **Enable USB Debugging:** Go back to **Settings > System > Developer Options** (or directly under Settings), and toggle on **"USB Debugging"**.
+- **Keep Screen On & Reconnect:** Ensure your phone is unlocked and the screen is ON. Unplug the USB cable from your phone and plug it back in.
+- **Authorize the Computer:** A prompt should appear on your phone's screen asking to "Allow USB debugging?". Check the box that says "Always allow from this computer" and tap **OK** / **Allow**.
+- **Verify:** Run `adb devices` again in your command prompt. Your device should now appear in the list with the word `device` next to it (if it says `unauthorized`, you haven't accepted the prompt on your phone).
+
 ## Project Structure (FSD)
 
 - app/ : Application bootstrap, routing, and global setup
