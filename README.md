@@ -12,11 +12,11 @@ Built with React Native and TypeScript, this project follows the **Feature-Slice
 ## Screenshots
 
 <div align="center">
-  <img src="./assets/screenshots/capture.png" alt="Capture Page" width="200"/>
+  <img src="./assets/screenshots/capture.jpg" alt="Capture Page" width="200"/>
   &nbsp;
-  <img src="./assets/screenshots/vault.png" alt="Vault Page" width="200"/>
+  <img src="./assets/screenshots/vault.jpg" alt="Vault Page" width="200"/>
   &nbsp;
-  <img src="./assets/screenshots/settings.png" alt="Settings Page" width="200"/>
+  <img src="./assets/screenshots/settings.jpg" alt="Settings Page" width="200"/>
 </div>
 
 ---
