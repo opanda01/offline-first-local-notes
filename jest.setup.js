@@ -46,7 +46,9 @@ jest.mock('react-native-fs', () => {
   };
 });
 
-// Mock react-native-share
+/* global Buffer */
+/* global Buffer, jest */
+import 'react-native-gesture-handler/jestSetup';
 jest.mock('react-native-share', () => ({
   open: jest.fn(() => Promise.resolve()),
 }));

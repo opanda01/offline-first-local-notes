@@ -50,7 +50,7 @@ export function useAddNote(): UseAddNoteReturn {
       };
       const note = noteRepository.create(dto);
       return {success: true, noteId: note.id};
-    } catch (error) {
+    } catch {
       return {success: false, error: 'Failed to save note'};
     }
   }, [content, selectedCategoryId]);

@@ -16,7 +16,7 @@ import {
   type TextStyle,
   type ViewStyle,
 } from 'react-native';
-import {colors, spacing, borderRadius, animation} from '../config';
+import {colors, spacing, borderRadius} from '../config';
 
 // ---------------------------------------------------------------------------
 // Types

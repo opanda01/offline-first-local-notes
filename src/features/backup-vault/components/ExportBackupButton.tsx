@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {Alert, View} from 'react-native';
 import {Button} from '@/shared/ui';
 import {useExportBackup} from '../model/useExportBackup';

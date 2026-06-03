@@ -46,7 +46,7 @@ export function useEditNote(noteId: string): UseEditNoteReturn {
         return {success: true};
       }
       return {success: false, error: 'Failed to update note'};
-    } catch (e) {
+    } catch {
       return {success: false, error: 'Unknown error'};
     }
   }, [note, noteId, content, categoryId]);

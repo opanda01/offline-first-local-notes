@@ -1,5 +1,5 @@
 import React, {useCallback, useState} from 'react';
-import {FlatList, StyleSheet, View} from 'react-native';
+import {FlatList, StyleSheet} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import {noteRepository, type Note, type NoteSortOptions} from '@/entities/note';
 import {EmptyState} from '@/shared/ui';
