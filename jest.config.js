@@ -9,4 +9,10 @@ module.exports = {
   },
   testMatch: ['**/__tests__/**/*.test.[jt]s?(x)'],
   clearMocks: true,
+  collectCoverage: true,
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!src/**/*.test.{ts,tsx}',
+    '!src/**/index.ts',
+  ],
 };

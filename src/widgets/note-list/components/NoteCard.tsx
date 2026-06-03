@@ -18,6 +18,9 @@ export function NoteCard({note, onPress, onLongPress}: NoteCardProps): React.JSX
     <Pressable
       onPress={() => onPress(note.id)}
       onLongPress={() => onLongPress?.(note.id)}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={`Note titled ${note.title}, updated on ${formatRelativeTime(note.updatedAt)}`}
       style={({pressed}) => [
         styles.card,
         {borderLeftColor: category?.color || 'transparent'},

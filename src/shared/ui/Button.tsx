@@ -111,6 +111,10 @@ export function Button({
     <Pressable
       onPress={onPress}
       disabled={isDisabled}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{disabled: isDisabled}}
       style={({pressed}) => [
         styles.base,
         SIZE_STYLES[size],
@@ -118,10 +122,7 @@ export function Button({
         fullWidth && styles.fullWidth,
         isDisabled && styles.disabled,
         pressed && !isDisabled && styles.pressed,
-      ]}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      accessibilityState={{disabled: isDisabled}}>
+      ]}>
       {loading ? (
         <ActivityIndicator
           size="small"

@@ -1,10 +1,12 @@
 import React, {useEffect} from 'react';
 import {StatusBar, StyleSheet, View} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {storage} from '@/shared/lib/mmkv-storage';
 import {categoryRepository, DEFAULT_CATEGORIES} from '@/entities/category';
 import {colors} from '@/shared/config';
 import {RootNavigator} from './navigation';
+import {ErrorBoundary} from './providers/ErrorBoundary';
 
 export function App(): React.JSX.Element {
   useEffect(() => {
@@ -18,10 +20,14 @@ export function App(): React.JSX.Element {
 
   return (
     <SafeAreaProvider>
-      <View style={styles.root}>
-        <StatusBar barStyle="light-content" backgroundColor={colors.background} />
-        <RootNavigator />
-      </View>
+      <ErrorBoundary>
+        <NavigationContainer>
+          <View style={styles.root}>
+            <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+            <RootNavigator />
+          </View>
+        </NavigationContainer>
+      </ErrorBoundary>
     </SafeAreaProvider>
   );
 }

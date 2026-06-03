@@ -1,5 +1,10 @@
 # OfflineFirst Local Notes
 
+![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Feature-Sliced Design](https://img.shields.io/badge/Architecture-FSD-4B32C3?style=for-the-badge)
+![Security](https://img.shields.io/badge/Security-AES--256--GCM-green?style=for-the-badge&logo=springsecurity&logoColor=white)
+
 OfflineFirst Local Notes is a privacy-focused, incredibly fast note-taking application designed to keep your data strictly on your device. Without relying on any cloud services or backend servers, it offers zero-latency performance and ensures your notes are never shared over the internet. You can securely export your notes to an AES-256 encrypted backup file and restore them whenever needed. 
 
 Built with React Native and TypeScript, this project serves as a showcase of modern, scalable frontend architecture known as Feature-Sliced Design (FSD).
@@ -7,6 +12,19 @@ Built with React Native and TypeScript, this project serves as a showcase of mod
 ## Architecture
 
 This project strictly adheres to the Feature-Sliced Design (FSD) methodology to maintain clean layer boundaries and prevent tightly coupled code.
+
+### Architecture Diagram
+```mermaid
+graph TD
+    A[app / Application Shell] --> B[pages / Screens]
+    B --> C[widgets / Smart Components]
+    C --> D[features / Business Logic]
+    D --> E[entities / Domain Models]
+    E --> F[shared / UI & Libs]
+    
+    classDef layer fill:#2D2D2D,stroke:#4B32C3,stroke-width:2px,color:#FFF;
+    class A,B,C,D,E,F layer;
+```
 
 ### Key Architectural Decisions
 - No backend, no cloud: 100% offline, your data stays entirely on your device.
@@ -70,9 +88,19 @@ npx react-native run-android
 - entities/ : Domain models and repositories (e.g., note, category)
 - shared/ : Reusable primitives, crypto libraries, storage adapters, design tokens
 
-## Security
+## Screenshots
+
+<div align="center">
+  <img src="https://via.placeholder.com/250x500.png?text=Capture+Page" alt="Capture Page" width="200"/>
+  &nbsp;
+  <img src="https://via.placeholder.com/250x500.png?text=Vault+Page" alt="Vault Page" width="200"/>
+  &nbsp;
+  <img src="https://via.placeholder.com/250x500.png?text=Settings+Page" alt="Settings Page" width="200"/>
+</div>
+
+## 🔐 Security
 
 All backups are encrypted locally using AES-256-GCM with a user-provided password before leaving the device. The password is never stored or transmitted anywhere.
 
-## License
+## 📄 License
 MIT
