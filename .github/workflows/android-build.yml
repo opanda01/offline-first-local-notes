@@ -7,7 +7,14 @@ on:
     paths-ignore:
       - 'README.md'
       - 'docs/**'
-      - 'assets/screenshots/**'
+      - 'assets/**'
+      - 'ios/**'
+      - '__tests__/**'
+      - '*.md'
+      - '.gitignore'
+      - 'jest.*'
+      - '.eslintrc.*'
+      - '.prettier*'
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
 jobs:
