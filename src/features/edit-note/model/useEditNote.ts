@@ -3,6 +3,8 @@ import {noteRepository, type Note} from '@/entities/note';
 
 export interface UseEditNoteReturn {
   note: Note | null;
+  title: string;
+  setTitle: (text: string) => void;
   content: string;
   setContent: (text: string) => void;
   categoryId: string | undefined;
@@ -17,6 +19,7 @@ export interface UseEditNoteReturn {
 
 export function useEditNote(noteId: string): UseEditNoteReturn {
   const [note, setNote] = useState<Note | null>(null);
+  const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [categoryId, setCategoryId] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(true);
@@ -25,6 +28,7 @@ export function useEditNote(noteId: string): UseEditNoteReturn {
     const loadedNote = noteRepository.getById(noteId);
     if (loadedNote) {
       setNote(loadedNote);
+      setTitle(loadedNote.title || '');
       setContent(loadedNote.content);
       setCategoryId(loadedNote.categoryId);
     }
@@ -38,6 +42,7 @@ export function useEditNote(noteId: string): UseEditNoteReturn {
 
     try {
       const updated = noteRepository.update(noteId, {
+        title: title.trim() || undefined,
         content: trimmed,
         categoryId,
       });
@@ -49,7 +54,7 @@ export function useEditNote(noteId: string): UseEditNoteReturn {
     } catch {
       return {success: false, error: 'Unknown error'};
     }
-  }, [note, noteId, content, categoryId]);
+  }, [note, noteId, title, content, categoryId]);
 
   const deleteNote = useCallback(() => {
     return noteRepository.delete(noteId);
@@ -71,10 +76,12 @@ export function useEditNote(noteId: string): UseEditNoteReturn {
     if (updated) setNote(updated);
   }, [note, noteId]);
 
-  const hasChanges = note ? content !== note.content || categoryId !== note.categoryId : false;
+  const hasChanges = note ? title !== (note.title || '') || content !== note.content || categoryId !== note.categoryId : false;
 
   return {
     note,
+    title,
+    setTitle,
     content,
     setContent,
     categoryId,

@@ -19,7 +19,6 @@ export function VaultPage(): React.JSX.Element {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>VAULT</Text>
         <Text style={styles.title}>Your notes</Text>
       </View>
 
@@ -56,15 +55,8 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
+    paddingTop: spacing.xxl, // Moved down slightly
     paddingBottom: spacing.md,
-  },
-  eyebrow: {
-    color: colors.textSecondary,
-    fontSize: typography.caption.fontSize,
-    fontWeight: '700',
-    letterSpacing: 1.5,
-    marginBottom: spacing.xs,
   },
   title: {
     color: colors.primary,

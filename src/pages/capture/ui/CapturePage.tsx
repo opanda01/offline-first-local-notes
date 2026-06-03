@@ -1,6 +1,8 @@
 import React, {useCallback} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {AddNoteForm} from '@/features/add-note';
+
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 export function CapturePage(): React.JSX.Element {
   const handleNoteSaved = useCallback(() => {
@@ -9,9 +11,9 @@ export function CapturePage(): React.JSX.Element {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <AddNoteForm onNoteSaved={handleNoteSaved} autoFocus />
-    </View>
+    </SafeAreaView>
   );
 }
 

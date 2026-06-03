@@ -1,6 +1,6 @@
 import {useState, useCallback} from 'react';
 import RNFS from 'react-native-fs';
-import DocumentPicker from 'react-native-document-picker';
+import { pick, types, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
 import {cryptoService} from '@/shared/lib/crypto-lib';
 import {noteRepository} from '@/entities/note';
 import {categoryRepository} from '@/entities/category';
@@ -19,13 +19,14 @@ export function useImportBackup() {
 
   const startImport = useCallback(async (): Promise<void> => {
     try {
-      const result = await DocumentPicker.pickSingle({
-        type: [DocumentPicker.types.json, DocumentPicker.types.allFiles],
+      const result = await pick({
+        allowMultiSelection: false,
+        type: [types.json, types.allFiles],
       });
-      setSelectedFileUri(result.uri);
+      setSelectedFileUri(result[0].uri);
       setShowPasswordDialog(true);
     } catch (err) {
-      if (!DocumentPicker.isCancel(err)) {
+      if (!(isErrorWithCode(err) && err.code === errorCodes.OPERATION_CANCELED)) {
         console.error('File pick error', err);
       }
     }

@@ -21,11 +21,14 @@ export interface Category {
 
   /** Oluşturulma zamanı */
   createdAt: number;
+
+  /** Üst kategori ID'si (alt kategori ise) */
+  parentId?: string;
 }
 
 export type CreateCategoryDTO = Pick<Category, 'name'> &
-  Partial<Pick<Category, 'color' | 'icon'>>;
+  Partial<Pick<Category, 'color' | 'icon' | 'parentId'>>;
 
 export type UpdateCategoryDTO = Partial<
-  Pick<Category, 'name' | 'color' | 'icon' | 'sortOrder'>
+  Pick<Category, 'name' | 'color' | 'icon' | 'sortOrder' | 'parentId'>
 >;

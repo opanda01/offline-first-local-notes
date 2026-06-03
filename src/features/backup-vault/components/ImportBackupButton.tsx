@@ -1,7 +1,6 @@
 import React from 'react';
 import {Alert, View, StyleSheet} from 'react-native';
-import {Button} from '@/shared/ui';
-import {spacing} from '@/shared/config';
+import {SettingsRow} from '@/shared/ui';
 import {useImportBackup} from '../model/useImportBackup';
 import {PasswordDialog} from './PasswordDialog';
 
@@ -29,10 +28,10 @@ export function ImportBackupButton(): React.JSX.Element {
   };
 
   return (
-    <View style={styles.container}>
-      <Button
+    <View>
+      <SettingsRow
         label="Import Encrypted Backup"
-        variant="secondary"
+        icon="import"
         onPress={handlePress}
       />
       <PasswordDialog
@@ -46,8 +45,4 @@ export function ImportBackupButton(): React.JSX.Element {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginTop: spacing.sm,
-  },
-});
+

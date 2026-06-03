@@ -5,7 +5,7 @@ import {
   NavigationContainer,
   type Theme,
 } from '@react-navigation/native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {CapturePage} from '../../pages/capture';
@@ -14,7 +14,7 @@ import {VaultStack} from './VaultStack';
 import {colors} from '@/shared/config';
 import type {RootTabParamList} from './types';
 
-const Tab = createBottomTabNavigator<RootTabParamList>();
+const Tab = createMaterialTopTabNavigator<RootTabParamList>();
 
 const corporateDarkTheme: Theme = {
   ...DarkTheme,
@@ -34,15 +34,18 @@ export function RootNavigator(): React.JSX.Element {
     <NavigationContainer theme={corporateDarkTheme}>
       <Tab.Navigator
         initialRouteName="Capture"
+        tabBarPosition="bottom"
         screenOptions={({route}) => ({
-          headerShown: false,
           tabBarActiveTintColor: colors.primary,
           tabBarInactiveTintColor: colors.textDisabled,
           tabBarStyle: styles.tabBar,
           tabBarLabelStyle: styles.tabBarLabel,
+          tabBarIndicatorStyle: { height: 0 },
+          tabBarShowIcon: true,
+          tabBarItemStyle: styles.tabBarItem,
           // eslint-disable-next-line react/no-unstable-nested-components
-          tabBarIcon: ({color, size}) => (
-            <Icon name={getTabIconName(route.name)} size={size} color={color} />
+          tabBarIcon: ({color}) => (
+            <Icon name={getTabIconName(route.name)} size={24} color={color} />
           ),
         })}>
         <Tab.Screen name="Capture" component={CapturePage} />
@@ -65,17 +68,22 @@ function getTabIconName(routeName: keyof RootTabParamList): string {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: 64,
+    height: 65,
     backgroundColor: colors.surface,
     borderTopColor: colors.border,
     borderTopWidth: 1,
     elevation: 0,
-    paddingBottom: 8,
-    paddingTop: 8,
+  },
+  tabBarItem: {
+    padding: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   tabBarLabel: {
     fontSize: 11,
     fontWeight: '600',
     letterSpacing: 0.2,
+    textTransform: 'none',
+    marginTop: 0,
   },
 });

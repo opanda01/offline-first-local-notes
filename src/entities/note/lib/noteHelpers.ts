@@ -45,7 +45,7 @@ export function sortNotes(
   notes: Note[],
   options?: NoteSortOptions,
 ): Note[] {
-  const {field, direction} = options || {field: 'updatedAt', direction: 'desc'};
+  const {field, direction} = options || {field: 'createdAt', direction: 'desc'};
 
   return [...notes].sort((a, b) => {
     let comparison = 0;

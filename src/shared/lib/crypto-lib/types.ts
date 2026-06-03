@@ -22,10 +22,10 @@ export interface EncryptedPayload {
   authTag: string;
   /** Base64-encoded PBKDF2 salt (16 bytes) */
   salt: string;
-  /** Algorithm identifier — always 'aes-256-gcm' */
-  algorithm: 'aes-256-gcm';
-  /** Payload format version — for forward compatibility */
-  version: 1;
+  /** Algorithm identifier */
+  algorithm: string;
+  /** Payload format version */
+  version: number;
 }
 
 /**

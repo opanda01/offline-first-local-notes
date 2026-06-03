@@ -7,11 +7,15 @@ import {
   View,
   Text,
   Alert,
+  ScrollView,
+  Pressable,
 } from 'react-native';
 import {useEditNote} from '../model/useEditNote';
 import {DeleteConfirmDialog} from './DeleteConfirmDialog';
 import {NoteActions} from './NoteActions';
-import {Button} from '@/shared/ui';
+import {categoryRepository} from '@/entities/category';
+import {CategorySelectionModal} from '@/features/add-note';
+import {Button, Icon} from '@/shared/ui';
 import {colors, spacing, typography} from '@/shared/config';
 import {formatRelativeTime, getWordCount} from '@/entities/note';
 // Not: CategoryPicker'ı add-note feature'dan kullanıyoruz (cross-slice import normalde istenmez ama FSD'de shared widget yapısına çıkarana kadar kullanılabilir).
@@ -35,8 +39,12 @@ export function EditNoteForm({
 }: EditNoteFormProps): React.JSX.Element {
   const {
     note,
+    title,
+    setTitle,
     content,
     setContent,
+    categoryId,
+    changeCategory,
     saveChanges,
     deleteNote,
     toggleFavorite,
@@ -45,7 +53,10 @@ export function EditNoteForm({
     isLoading,
   } = useEditNote(noteId);
 
+  const currentCategory = categoryId ? categoryRepository.getById(categoryId) : null;
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   // Unsaved changes guard
   const handleBack = () => {
@@ -63,9 +74,19 @@ export function EditNoteForm({
     }
   };
 
-  const handleSave = () => {
+  const handlePreSave = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleConfirmSave = () => {
+    if (!hasChanges) {
+      setIsModalVisible(false);
+      onSaved?.();
+      return;
+    }
     const result = saveChanges();
     if (result.success) {
+      setIsModalVisible(false);
       onSaved?.();
     } else {
       Alert.alert('Error', result.error);
@@ -86,9 +107,11 @@ export function EditNoteForm({
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <View style={styles.header}>
-        <Button label="Back" variant="ghost" onPress={handleBack} size="sm" />
+        <View style={styles.headerLeft}>
+          <Text style={styles.appTitle}>Secret Note</Text>
+        </View>
         <View style={styles.headerActions}>
           <NoteActions
             isFavorite={note.isFavorite}
@@ -100,21 +123,47 @@ export function EditNoteForm({
           <View style={styles.gap} />
           <Button
             label="Save"
-            onPress={handleSave}
-            disabled={!hasChanges}
+            onPress={handlePreSave}
+            variant="primary"
             size="sm"
           />
+          <View style={styles.gap} />
+          <Pressable onPress={handleBack} style={styles.backButton}>
+            <Icon name="arrow-left" size="sm" color={colors.background} />
+          </Pressable>
+        </View>
+      </View>
+
+      <View style={styles.metaHeader}>
+        <View style={styles.categoryBadgeContainer}>
+          <Text style={styles.categoryLabel}>Category:</Text>
+          <Text
+            style={styles.categoryBadge}
+            onPress={() => setIsModalVisible(true)}>
+            {currentCategory ? `${currentCategory.icon || '📁'} ${currentCategory.name}` : '📁 Uncategorized'}
+          </Text>
         </View>
       </View>
 
       <TextInput
-        style={styles.input}
-        multiline
-        value={content}
-        onChangeText={setContent}
-        textAlignVertical="top"
+        style={styles.titleInput}
+        placeholder="Title"
+        placeholderTextColor={colors.textDisabled}
+        value={title}
+        onChangeText={setTitle}
         selectionColor={colors.accent}
       />
+
+      <View style={styles.inputWrapper}>
+        <TextInput
+          style={styles.input}
+          multiline
+          value={content}
+          onChangeText={setContent}
+          textAlignVertical="top"
+          selectionColor={colors.accent}
+        />
+      </View>
 
       <View style={styles.footer}>
         <Text style={styles.metaText}>
@@ -127,6 +176,14 @@ export function EditNoteForm({
         visible={isDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setIsDeleteDialogOpen(false)}
+      />
+
+      <CategorySelectionModal
+        visible={isModalVisible}
+        selectedCategoryId={categoryId}
+        onSelectCategory={changeCategory}
+        onConfirm={handleConfirmSave}
+        onCancel={() => setIsModalVisible(false)}
       />
     </KeyboardAvoidingView>
   );
@@ -145,6 +202,30 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     paddingBottom: spacing.sm,
   },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    backgroundColor: colors.accent, // Canlı bir renk
+    padding: spacing.sm,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.accent,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  metaHeader: {
+    paddingHorizontal: spacing.lg,
+    marginTop: spacing.md,
+    marginBottom: spacing.xs,
+  },
+  appTitle: {
+    fontSize: typography.h2.fontSize,
+    fontWeight: 'bold',
+    color: colors.primary,
+    marginBottom: spacing.xs,
+  },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -152,11 +233,53 @@ const styles = StyleSheet.create({
   gap: {
     width: spacing.md,
   },
+  categoryBadgeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  categoryLabel: {
+    fontSize: typography.caption.fontSize,
+    color: colors.textSecondary,
+    marginRight: spacing.sm,
+  },
+  categoryBadge: {
+    fontSize: typography.body.fontSize,
+    fontWeight: 'bold',
+    color: colors.primary,
+    backgroundColor: colors.surfaceElevated,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: 'hidden',
+  },
+  titleInput: {
+    marginTop: spacing.sm,
+    marginHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    fontSize: typography.h2.fontSize,
+    fontWeight: 'bold',
+    color: colors.primary,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+  },
+  inputWrapper: {
+    flex: 1,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.md,
+    marginTop: spacing.xs,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
   input: {
     flex: 1,
-    paddingHorizontal: spacing.lg,
+    padding: spacing.md,
     fontSize: typography.body.fontSize,
-    lineHeight: typography.body.lineHeight,
     color: colors.primary,
   },
   footer: {

@@ -1,5 +1,5 @@
 import React, {useCallback, useState} from 'react';
-import {ScrollView, StyleSheet, Text, Pressable, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, Pressable, View, Alert} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import {categoryRepository, type Category} from '@/entities/category';
 import {colors, spacing, borderRadius, typography} from '@/shared/config';
@@ -17,9 +17,33 @@ export function CategoryFilter({
 
   useFocusEffect(
     useCallback(() => {
-      setCategories(categoryRepository.getAll());
+      // Only show root categories in the top filter bar
+      const allCats = categoryRepository.getAll();
+      setCategories(allCats.filter(cat => !cat.parentId));
     }, []),
   );
+
+  const handleDeleteCategory = (cat: Category) => {
+    Alert.alert(
+      'Delete Category',
+      `Are you sure you want to delete "${cat.name}"?`,
+      [
+        {text: 'Cancel', style: 'cancel'},
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            categoryRepository.delete(cat.id);
+            if (selectedCategoryId === cat.id) {
+              onSelectCategory(undefined);
+            }
+            setCategories(categoryRepository.getAll().filter(c => !c.parentId));
+          },
+        },
+      ],
+      {cancelable: true},
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -44,6 +68,7 @@ export function CategoryFilter({
           return (
             <Pressable
               key={cat.id}
+              onLongPress={() => handleDeleteCategory(cat)}
               onPress={() => onSelectCategory(cat.id)}
               style={[
                 styles.chip,

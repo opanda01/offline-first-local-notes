@@ -26,6 +26,7 @@ export const categoryRepository = {
       icon: dto.icon,
       sortOrder: allCategories.length,
       createdAt: Date.now(),
+      parentId: dto.parentId,
     };
 
     // Kategoriyi kaydet

@@ -65,10 +65,15 @@ export const noteRepository = {
     const existing = this.getById(id);
     if (!existing) return null;
 
+    // Yalnızca başlık veya içerik gerçekten değiştiyse tarihi güncelle
+    const titleChanged = dto.title !== undefined && dto.title !== existing.title;
+    const contentChanged = dto.content !== undefined && dto.content !== existing.content;
+    const shouldUpdateTimestamp = titleChanged || contentChanged;
+
     const updated: Note = {
       ...existing,
       ...dto,
-      updatedAt: Date.now(),
+      updatedAt: shouldUpdateTimestamp ? Date.now() : existing.updatedAt,
     };
 
     storage.set<Note>(`${NOTES_KEY_PREFIX}${id}`, updated);

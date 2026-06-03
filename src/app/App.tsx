@@ -2,18 +2,28 @@ import React, {useEffect} from 'react';
 import {StatusBar, StyleSheet, View} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {storage} from '@/shared/lib/mmkv-storage';
-import {categoryRepository, DEFAULT_CATEGORIES} from '@/entities/category';
+import {categoryRepository} from '@/entities/category';
 import {colors} from '@/shared/config';
 import {RootNavigator} from './navigation';
 import {ErrorBoundary} from './providers/ErrorBoundary';
 
 export function App(): React.JSX.Element {
   useEffect(() => {
-    // Seed default categories on first run
     const isInitialized = storage.contains('app:initialized');
     if (!isInitialized) {
-      DEFAULT_CATEGORIES.forEach(cat => categoryRepository.create(cat));
       storage.set('app:initialized', true);
+    }
+
+    const isCleanedUp = storage.contains('app:cleaned_defaults_v2');
+    if (!isCleanedUp) {
+      const all = categoryRepository.getAll();
+      const defaultNames = ['Personal', 'Work', 'Ideas'];
+      for (const cat of all) {
+        if (defaultNames.includes(cat.name)) {
+          categoryRepository.delete(cat.id);
+        }
+      }
+      storage.set('app:cleaned_defaults_v2', true);
     }
   }, []);
 

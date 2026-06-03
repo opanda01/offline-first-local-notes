@@ -7,6 +7,10 @@ import {useState, useCallback} from 'react';
 import {noteRepository, getWordCount, type CreateNoteDTO} from '@/entities/note';
 
 export interface UseAddNoteReturn {
+  /** Not başlığı */
+  title: string;
+  /** Başlık değiştirme handler'ı */
+  setTitle: (text: string) => void;
   /** Mevcut not içeriği */
   content: string;
   /** İçerik değiştirme handler'ı */
@@ -34,6 +38,7 @@ export interface SaveNoteResult {
 }
 
 export function useAddNote(): UseAddNoteReturn {
+  const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>();
 
@@ -45,6 +50,7 @@ export function useAddNote(): UseAddNoteReturn {
 
     try {
       const dto: CreateNoteDTO = {
+        title: title.trim() || undefined,
         content: trimmed,
         categoryId: selectedCategoryId,
       };
@@ -53,14 +59,17 @@ export function useAddNote(): UseAddNoteReturn {
     } catch {
       return {success: false, error: 'Failed to save note'};
     }
-  }, [content, selectedCategoryId]);
+  }, [title, content, selectedCategoryId]);
 
   const resetForm = useCallback(() => {
+    setTitle('');
     setContent('');
     setSelectedCategoryId(undefined);
   }, []);
 
   return {
+    title,
+    setTitle,
     content,
     setContent,
     selectedCategoryId,

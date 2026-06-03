@@ -54,7 +54,7 @@ jest.mock('react-native-share', () => ({
 }));
 
 // Mock DocumentPicker
-jest.mock('react-native-document-picker', () => ({
+jest.mock('@react-native-documents/picker', () => ({
   pickSingle: jest.fn(() => Promise.resolve({uri: 'mock-file-uri'})),
   isCancel: jest.fn(() => false),
   types: {

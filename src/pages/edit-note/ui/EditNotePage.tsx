@@ -1,10 +1,12 @@
 import React, {useCallback} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {useNavigation, useRoute, type RouteProp} from '@react-navigation/native';
 import {EditNoteForm} from '@/features/edit-note';
 import type {VaultStackParamList} from '@/app/navigation/types';
 
 type EditNoteRouteProps = RouteProp<VaultStackParamList, 'EditNote'>;
+
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 export function EditNotePage(): React.JSX.Element {
   const route = useRoute<EditNoteRouteProps>();
@@ -24,14 +26,14 @@ export function EditNotePage(): React.JSX.Element {
   }, [navigation]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <EditNoteForm
         noteId={noteId}
         onSaved={handleSaved}
         onDeleted={handleDeleted}
         onBack={handleBack}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Alert, View} from 'react-native';
-import {Button} from '@/shared/ui';
+import {SettingsRow} from '@/shared/ui';
 import {useExportBackup} from '../model/useExportBackup';
 import {PasswordDialog} from './PasswordDialog';
 
@@ -18,9 +18,9 @@ export function ExportBackupButton(): React.JSX.Element {
 
   return (
     <View>
-      <Button
+      <SettingsRow
         label="Export Encrypted Backup"
-        variant="secondary"
+        icon="export"
         onPress={startExport}
       />
       <PasswordDialog
