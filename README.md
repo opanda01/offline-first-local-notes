@@ -98,9 +98,9 @@ npx react-native run-android
   <img src="https://via.placeholder.com/250x500.png?text=Settings+Page" alt="Settings Page" width="200"/>
 </div>
 
-## 🔐 Security
+## Security
 
 All backups are encrypted locally using AES-256-GCM with a user-provided password before leaving the device. The password is never stored or transmitted anywhere.
 
-## 📄 License
+## License
 MIT
