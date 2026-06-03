@@ -6,10 +6,8 @@ import {
   TextInput,
   View,
   Text,
-  ScrollView,
 } from 'react-native';
 import {useAddNote} from '../model/useAddNote';
-import {categoryRepository} from '@/entities/category';
 import {CategorySelectionModal} from './CategorySelectionModal';
 import {CharacterCounter} from './CharacterCounter';
 import {Button} from '@/shared/ui';
@@ -36,8 +34,6 @@ export function AddNoteForm({
     wordCount,
     charCount,
   } = useAddNote();
-
-  const currentCategory = selectedCategoryId ? categoryRepository.getById(selectedCategoryId) : null;
 
   const inputRef = useRef<TextInput>(null);
 

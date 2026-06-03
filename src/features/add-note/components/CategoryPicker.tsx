@@ -127,7 +127,8 @@ export function CategoryPicker({selectedId, onSelect, visible}: CategoryPickerPr
             }}
             style={[
               styles.chip,
-              {borderLeftColor: cat.color, borderLeftWidth: 4},
+              styles.chipColored,
+              {borderLeftColor: cat.color},
               isSelected && styles.chipSelected,
             ]}>
             <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
@@ -224,6 +225,9 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.md,
     backgroundColor: 'transparent',
+  },
+  chipColored: {
+    borderLeftWidth: 4,
   },
   chipSelected: {
     backgroundColor: colors.surfaceElevated,

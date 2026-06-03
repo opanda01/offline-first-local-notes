@@ -7,7 +7,6 @@ import {
   View,
   Text,
   Alert,
-  ScrollView,
   Pressable,
 } from 'react-native';
 import {useEditNote} from '../model/useEditNote';

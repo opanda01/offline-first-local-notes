@@ -1,5 +1,5 @@
 import React from 'react';
-import {Alert, View, StyleSheet} from 'react-native';
+import {Alert, View} from 'react-native';
 import {SettingsRow} from '@/shared/ui';
 import {useImportBackup} from '../model/useImportBackup';
 import {PasswordDialog} from './PasswordDialog';
