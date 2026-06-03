@@ -47,6 +47,7 @@ export function CategoryPicker({selectedId, onSelect}: CategoryPickerProps): Rea
               onPress={() => onSelect(cat.id)}
               style={[
                 styles.chip,
+                // eslint-disable-next-line react-native/no-inline-styles
                 {borderLeftColor: cat.color, borderLeftWidth: 4},
                 isSelected && styles.chipSelected,
               ]}>

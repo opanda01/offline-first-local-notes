@@ -1,6 +1,5 @@
 import React, {useEffect} from 'react';
 import {StatusBar, StyleSheet, View} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {storage} from '@/shared/lib/mmkv-storage';
 import {categoryRepository, DEFAULT_CATEGORIES} from '@/entities/category';
@@ -21,12 +20,10 @@ export function App(): React.JSX.Element {
   return (
     <SafeAreaProvider>
       <ErrorBoundary>
-        <NavigationContainer>
-          <View style={styles.root}>
-            <StatusBar barStyle="light-content" backgroundColor={colors.background} />
-            <RootNavigator />
-          </View>
-        </NavigationContainer>
+        <View style={styles.root}>
+          <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+          <RootNavigator />
+        </View>
       </ErrorBoundary>
     </SafeAreaProvider>
   );

@@ -40,6 +40,7 @@ export function RootNavigator(): React.JSX.Element {
           tabBarInactiveTintColor: colors.textDisabled,
           tabBarStyle: styles.tabBar,
           tabBarLabelStyle: styles.tabBarLabel,
+          // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
             <Icon name={getTabIconName(route.name)} size={size} color={color} />
           ),
