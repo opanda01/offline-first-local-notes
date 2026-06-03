@@ -1,97 +1,78 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# OfflineFirst Local Notes
 
-# Getting Started
+OfflineFirst Local Notes is a privacy-focused, incredibly fast note-taking application designed to keep your data strictly on your device. Without relying on any cloud services or backend servers, it offers zero-latency performance and ensures your notes are never shared over the internet. You can securely export your notes to an AES-256 encrypted backup file and restore them whenever needed. 
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+Built with React Native and TypeScript, this project serves as a showcase of modern, scalable frontend architecture known as Feature-Sliced Design (FSD).
 
-## Step 1: Start Metro
+## Architecture
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+This project strictly adheres to the Feature-Sliced Design (FSD) methodology to maintain clean layer boundaries and prevent tightly coupled code.
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### Key Architectural Decisions
+- No backend, no cloud: 100% offline, your data stays entirely on your device.
+- MMKV for storage: JSI-based storage which is significantly faster than standard AsyncStorage.
+- AES-256-GCM encryption: Military-grade security for your local backup files.
+- Feature-Sliced Design: Strict unidirectional dependency rules preventing spaghetti code.
 
-```sh
-# Using npm
-npm start
+## Tech Stack
+| Layer | Technology |
+|-------|-----------|
+| Framework | React Native CLI |
+| Language | TypeScript (strict mode) |
+| Storage | react-native-mmkv |
+| Crypto | react-native-quick-crypto (AES-256-GCM) |
+| Navigation | React Navigation 7 |
+| Architecture | Feature-Sliced Design |
 
-# OR using Yarn
-yarn start
+## 📥 How to Download & Run
+
+### For Regular Users
+
+Currently, this application is not published on the App Store or Google Play Store. To use it on your device without building from source, you would typically need a pre-built package:
+- **Android**: You can install the `.apk` file (if provided in the [Releases](https://github.com/) section of this repository). Ensure you allow "Install from Unknown Sources" in your device settings.
+- **iOS**: Currently, there is no direct download available for iOS users. Apple's ecosystem does not permit direct installations (.apk style) without an Apple Developer Account or TestFlight configuration. Since this project was developed for personal use and portfolio showcase, iOS public distribution is not configured at this stage but may be added in future updates.
+
+### For Developers (Build from Source)
+
+**Prerequisites:**
+- Node.js (v22+)
+- A Mac computer (strictly required if you want to build for iOS)
+- Xcode (for iOS) and Android Studio (for Android)
+
+**1. Clone and Install Dependencies**
+```bash
+git clone https://github.com/yourusername/OfflineFirstLocalNotes.git
+cd OfflineFirstLocalNotes
+npm install
 ```
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+**2. iOS Setup (Mac Only)**
+```bash
+cd ios
+pod install
+cd ..
+npx react-native run-ios
 ```
+*Note: To run on a physical iPhone, open the `ios/OfflineFirstLocalNotes.xcworkspace` in Xcode, configure your Apple ID in the "Signing & Capabilities" tab, and select your connected iPhone as the run destination.*
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+**3. Android Setup**
+```bash
+npx react-native run-android
 ```
+*Note: To generate a release APK for Android, run `./gradlew assembleRelease` inside the `android/` directory.*
 
-Then, and every time you update your native dependencies, run:
+## Project Structure (FSD)
 
-```sh
-bundle exec pod install
-```
+- app/ : Application bootstrap, routing, and global setup
+- pages/ : Top-level screens integrating widgets and features
+- widgets/ : Smart components combining entities and features
+- features/ : Business logic slices (e.g., add-note, edit-note, backup-vault)
+- entities/ : Domain models and repositories (e.g., note, category)
+- shared/ : Reusable primitives, crypto libraries, storage adapters, design tokens
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## Security
 
-```sh
-# Using npm
-npm run ios
+All backups are encrypted locally using AES-256-GCM with a user-provided password before leaving the device. The password is never stored or transmitted anywhere.
 
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## License
+MIT
