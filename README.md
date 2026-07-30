@@ -403,7 +403,7 @@ This repository is set up for long periods without manual maintenance: Dependabo
 | Workflow | File | When it runs |
 |----------|------|----------------|
 | **CI** | `.github/workflows/ci.yml` | Every push and PR to `main` — `npm ci`, TypeScript, ESLint, Jest (`build-and-test`) |
-| **Build Android APK** | `.github/workflows/android-build.yml` | Push to `main` (with path filters), PRs that touch `package.json`, lockfile, `android/**`, or workflows; weekly schedule (Monday 06:00 UTC); manual dispatch |
+| **Build Android APK** | `.github/workflows/android-build.yml` | After merge to `main` only (path filters; skips docs/Gemfile-only/.github-only changes); manual dispatch |
 | **Dependabot auto-merge** | `.github/workflows/dependabot-auto-merge.yml` | Dependabot PRs — enables auto-merge for **direct** patch/minor updates after checks pass |
 | **CodeQL** | `.github/workflows/codeql.yml` | Push/PR to `main` and weekly schedule — security analysis for JavaScript/TypeScript |
 
@@ -413,7 +413,7 @@ This repository is set up for long periods without manual maintenance: Dependabo
 2. Select **Build Android APK** and a successful run on `main`.
 3. Under **Artifacts**, download **Secret-App-Release-APK**.
 
-PR builds run the same Gradle step but do not upload an artifact (faster feedback).
+Dependabot PRs rely on **CI** (`build-and-test`) only; the APK is produced after merge to `main`.
 
 ### Dependabot
 
@@ -433,7 +433,7 @@ The **`main-protection`** ruleset should require:
 - Status check **`build-and-test`** with strict “up to date” policy.
 - No force push or branch deletion.
 
-Optional: add **`build-android`** as a required check only after you confirm it runs on the PRs you care about (native or dependency changes). It is not required for docs-only PRs because of path filters.
+**`build-android`** is not a PR check; it runs on `main` after merge (see workflow path filters).
 
 ### Repository settings checklist
 
