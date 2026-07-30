@@ -1,28 +1,36 @@
 import React, {useState} from 'react';
 import {StyleSheet, Text, View, ScrollView} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ExportBackupButton, ImportBackupButton} from '@/features/backup-vault';
 import {CategoryManagerModal} from '@/widgets/category-manager';
 import {NoteStats} from '@/widgets/note-stats';
 import {colors, spacing, typography} from '@/shared/config';
 import {SettingsRow} from '@/shared/ui';
 
-const TECH_STACK: {label: string; value: string; icon?: string}[] = [
-  {label: 'App', value: 'Secret (offline-first)', icon: 'shield-lock-outline'},
-  {label: 'Version', value: '0.0.1', icon: 'tag-outline'},
-  {label: 'Framework', value: 'React Native 0.85', icon: 'cellphone'},
-  {label: 'Language', value: 'TypeScript', icon: 'language-typescript'},
-  {label: 'Architecture', value: 'Feature-Sliced Design', icon: 'sitemap-outline'},
-  {label: 'Storage', value: 'MMKV', icon: 'database-outline'},
-  {label: 'Encryption', value: 'AES-256-CBC', icon: 'lock-outline'},
-  {label: 'Navigation', value: 'React Navigation 7', icon: 'routes'},
-  {label: 'Backup I/O', value: 'FS, Share, Document Picker', icon: 'folder-outline'},
+const TECH_STACK: {label: string; value: string}[] = [
+  {label: 'App', value: 'Secret (offline-first)'},
+  {label: 'Version', value: '0.0.1'},
+  {label: 'Framework', value: 'React Native 0.85'},
+  {label: 'Language', value: 'TypeScript'},
+  {label: 'Architecture', value: 'Feature-Sliced Design'},
+  {label: 'Storage', value: 'MMKV'},
+  {label: 'Encryption', value: 'AES-256-CBC'},
+  {label: 'Navigation', value: 'React Navigation 7'},
+  {label: 'Backup I/O', value: 'FS, Share, Document Picker'},
 ];
 
 export function SettingsPage(): React.JSX.Element {
   const [isCategoryModalVisible, setCategoryModalVisible] = useState(false);
+  const insets = useSafeAreaInsets();
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[
+        styles.content,
+        {paddingBottom: insets.bottom + spacing.xxl + 72},
+      ]}
+      showsVerticalScrollIndicator>
       <View style={styles.header}>
         <Text style={styles.title}>Preferences</Text>
       </View>
@@ -50,13 +58,14 @@ export function SettingsPage(): React.JSX.Element {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>About</Text>
         <View style={styles.card}>
-          {TECH_STACK.map(item => (
-            <SettingsRow
-              key={item.label}
-              label={item.label}
-              value={item.value}
-              icon={item.icon}
-            />
+          {TECH_STACK.map((item, index) => (
+            <View key={item.label}>
+              {index > 0 ? <View style={styles.aboutDivider} /> : null}
+              <View style={styles.aboutRow}>
+                <Text style={styles.aboutLabel}>{item.label}</Text>
+                <Text style={styles.aboutValue}>{item.value}</Text>
+              </View>
+            </View>
           ))}
         </View>
       </View>
@@ -104,5 +113,30 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: spacing.md,
     overflow: 'hidden',
+  },
+  aboutRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+  },
+  aboutLabel: {
+    flex: 1,
+    fontSize: typography.body.fontSize,
+    color: colors.textSecondary,
+  },
+  aboutValue: {
+    flex: 1.2,
+    fontSize: typography.body.fontSize,
+    fontWeight: '500',
+    color: colors.primary,
+    textAlign: 'right',
+  },
+  aboutDivider: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginLeft: spacing.md,
   },
 });

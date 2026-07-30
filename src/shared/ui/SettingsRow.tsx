@@ -49,20 +49,29 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceElevated,
   },
   left: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    marginRight: spacing.sm,
+    minWidth: 0,
   },
   right: {
+    flexShrink: 1,
+    maxWidth: '52%',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-end',
     gap: spacing.sm,
   },
   label: {
     fontSize: typography.body.fontSize,
     fontWeight: '500',
+    flexShrink: 1,
   },
   value: {
     fontSize: typography.body.fontSize,
     color: colors.textSecondary,
+    textAlign: 'right',
+    flexShrink: 1,
   },
 });
