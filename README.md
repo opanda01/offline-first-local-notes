@@ -33,6 +33,7 @@ Built with React Native and TypeScript, this project follows the **Feature-Slice
 - [Security & Encryption](#security--encryption)
 - [Design System](#design-system)
 - [How to Download & Run](#how-to-download--run)
+- [Maintenance & CI/CD](#maintenance--cicd)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
@@ -390,6 +391,59 @@ npx react-native run-ios
 npx react-native run-android
 ```
 *To generate a release APK, run `./gradlew assembleRelease` inside the `android/` directory.*
+
+---
+
+## Maintenance & CI/CD
+
+This repository is set up for long periods without manual maintenance: Dependabot opens update PRs, GitHub Actions verify changes, and patch/minor dependency updates can merge automatically when checks pass.
+
+### Workflows
+
+| Workflow | File | When it runs |
+|----------|------|----------------|
+| **CI** | `.github/workflows/ci.yml` | Every push and PR to `main` — `npm ci`, TypeScript, ESLint, Jest (`build-and-test`) |
+| **Build Android APK** | `.github/workflows/android-build.yml` | Push to `main` (with path filters), PRs that touch `package.json`, lockfile, `android/**`, or workflows; weekly schedule (Monday 06:00 UTC); manual dispatch |
+| **Dependabot auto-merge** | `.github/workflows/dependabot-auto-merge.yml` | Dependabot PRs — enables auto-merge for **direct** patch/minor updates after checks pass |
+| **CodeQL** | `.github/workflows/codeql.yml` | Push/PR to `main` and weekly schedule — security analysis for JavaScript/TypeScript |
+
+### Download a release APK from CI
+
+1. Open the repository on GitHub → **Actions**.
+2. Select **Build Android APK** and a successful run on `main`.
+3. Under **Artifacts**, download **Secret-App-Release-APK**.
+
+PR builds run the same Gradle step but do not upload an artifact (faster feedback).
+
+### Dependabot
+
+Configuration: [`.github/dependabot.yml`](.github/dependabot.yml).
+
+- **npm**, **GitHub Actions**, **Gradle** (`android/`), and **Bundler** (`Gemfile`) — weekly (Bundler monthly).
+- **Grouped updates:** `react-native` + `@react-native/*`, and navigation-related packages.
+- **Major bumps** for `react-native` and `@react-native/*` are ignored by Dependabot; upgrade those manually in one PR.
+
+Enable **Dependabot alerts** and **Dependabot security updates** under **Settings → Code security and analysis**.
+
+### Branch rules (`main`)
+
+The **`main-protection`** ruleset should require:
+
+- Pull requests before merging (0 approvals is fine for solo maintenance).
+- Status check **`build-and-test`** with strict “up to date” policy.
+- No force push or branch deletion.
+
+Optional: add **`build-android`** as a required check only after you confirm it runs on the PRs you care about (native or dependency changes). It is not required for docs-only PRs because of path filters.
+
+### Repository settings checklist
+
+- **Settings → General → Pull Requests:** enable **Allow auto-merge** (for Dependabot patch/minor).
+- **Settings → Actions → General → Workflow permissions:** allow read/write for workflows (needed for auto-merge), or keep read-only default if the auto-merge workflow’s `permissions` block is sufficient.
+- **Notifications:** enable failures for Actions and Dependabot security alerts on your GitHub account.
+
+### iOS (later)
+
+iOS is not built in CI yet. When added, commit `Podfile.lock` / `Gemfile.lock` and extend Dependabot and workflows accordingly.
 
 ---
 

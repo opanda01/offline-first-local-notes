@@ -5,17 +5,34 @@ on:
     branches:
       - main
     paths-ignore:
-      - 'README.md'
-      - 'docs/**'
-      - 'assets/**'
-      - 'ios/**'
-      - '__tests__/**'
+      - README.md
+      - docs/**
+      - assets/**
+      - ios/**
+      - __tests__/**
       - '*.md'
-      - '.gitignore'
-      - 'jest.*'
-      - '.eslintrc.*'
-      - '.prettier*'
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+      - .gitignore
+      - jest.*
+      - .eslintrc.*
+      - .prettier*
+  pull_request:
+    branches:
+      - main
+    paths:
+      - package.json
+      - package-lock.json
+      - android/**
+      - .github/workflows/**
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-android:
@@ -29,17 +46,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.11.0'
-          cache: 'npm'
+          cache: npm
 
       - name: Install npm dependencies
-        run: npm install
+        run: npm ci
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'zulu'
-          cache: 'gradle'
+          distribution: zulu
+          cache: gradle
 
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew
@@ -48,6 +65,7 @@ jobs:
         run: cd android && ./gradlew assembleRelease --no-daemon
 
       - name: Upload APK Artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: Secret-App-Release-APK
