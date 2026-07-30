@@ -6,6 +6,18 @@ import {NoteStats} from '@/widgets/note-stats';
 import {colors, spacing, typography} from '@/shared/config';
 import {SettingsRow} from '@/shared/ui';
 
+const TECH_STACK: {label: string; value: string; icon?: string}[] = [
+  {label: 'App', value: 'Secret (offline-first)', icon: 'shield-lock-outline'},
+  {label: 'Version', value: '0.0.1', icon: 'tag-outline'},
+  {label: 'Framework', value: 'React Native 0.85', icon: 'cellphone'},
+  {label: 'Language', value: 'TypeScript', icon: 'language-typescript'},
+  {label: 'Architecture', value: 'Feature-Sliced Design', icon: 'sitemap-outline'},
+  {label: 'Storage', value: 'MMKV', icon: 'database-outline'},
+  {label: 'Encryption', value: 'AES-256-CBC', icon: 'lock-outline'},
+  {label: 'Navigation', value: 'React Navigation 7', icon: 'routes'},
+  {label: 'Backup I/O', value: 'FS, Share, Document Picker', icon: 'folder-outline'},
+];
+
 export function SettingsPage(): React.JSX.Element {
   const [isCategoryModalVisible, setCategoryModalVisible] = useState(false);
 
@@ -32,6 +44,20 @@ export function SettingsPage(): React.JSX.Element {
         <View style={styles.card}>
           <ExportBackupButton />
           <ImportBackupButton />
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>About</Text>
+        <View style={styles.card}>
+          {TECH_STACK.map(item => (
+            <SettingsRow
+              key={item.label}
+              label={item.label}
+              value={item.value}
+              icon={item.icon}
+            />
+          ))}
         </View>
       </View>
 
