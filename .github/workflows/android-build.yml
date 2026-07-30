@@ -15,23 +15,16 @@ on:
       - jest.*
       - .eslintrc.*
       - .prettier*
-  pull_request:
-    branches:
-      - main
-    paths:
-      - package.json
-      - package-lock.json
-      - android/**
-      - .github/workflows/**
-  schedule:
-    - cron: '0 6 * * 1'
+      - Gemfile
+      - Gemfile.lock
+      - .github/**
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: android-${{ github.workflow }}-${{ github.ref }}
+  group: android-${{ github.workflow }}-main
   cancel-in-progress: true
 
 jobs:
@@ -65,7 +58,6 @@ jobs:
         run: cd android && ./gradlew assembleRelease --no-daemon
 
       - name: Upload APK Artifact
-        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: Secret-App-Release-APK
