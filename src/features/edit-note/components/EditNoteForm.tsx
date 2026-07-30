@@ -13,15 +13,11 @@ import {useEditNote} from '../model/useEditNote';
 import {DeleteConfirmDialog} from './DeleteConfirmDialog';
 import {NoteActions} from './NoteActions';
 import {categoryRepository} from '@/entities/category';
-import {CategorySelectionModal} from '@/features/add-note';
+import {CategorySelectionModal} from '@/features/category-management';
+import {ChecklistEditor} from '@/features/checklist-note';
 import {Button, Icon} from '@/shared/ui';
-import {colors, spacing, typography} from '@/shared/config';
-import {formatRelativeTime, getWordCount} from '@/entities/note';
-// Not: CategoryPicker'ı add-note feature'dan kullanıyoruz (cross-slice import normalde istenmez ama FSD'de shared widget yapısına çıkarana kadar kullanılabilir).
-// Fakat plan: CategoryPicker'ı add-note'dan import etmemek gerekir. En doğrusu onu entities'e veya shared/ui'a çekmektir. 
-// Planı bozmamak için şimdilik kendi yazdığı component gibi veya sadece kategori adını gösterip basit tutacağız.
-// FSD kuralı 203. satırda: features/edit-note -> features/add-note IMPORT YOK.
-// O zaman Category seçimi edit note formunda şimdilik yapılmayacak ya da basit tutulacak. 
+import {colors, spacing, typography, borderRadius} from '@/shared/config';
+import {formatRelativeTime, getWordCount, NOTE_COLOR_PALETTE, type NoteType} from '@/entities/note';
 
 interface EditNoteFormProps {
   noteId: string;
@@ -42,6 +38,12 @@ export function EditNoteForm({
     setTitle,
     content,
     setContent,
+    noteType,
+    setNoteType,
+    checklistItems,
+    setChecklistItems,
+    noteColor,
+    setNoteColor,
     categoryId,
     changeCategory,
     saveChanges,
@@ -144,6 +146,48 @@ export function EditNoteForm({
         </View>
       </View>
 
+      <View style={styles.colorRow}>
+        <Pressable
+          onPress={() => setNoteColor(undefined)}
+          style={[styles.colorSwatch, styles.colorClear, !noteColor && styles.colorSwatchActive]}>
+          <Text style={styles.colorClearText}>None</Text>
+        </Pressable>
+        {NOTE_COLOR_PALETTE.map(color => (
+          <Pressable
+            key={color}
+            onPress={() => setNoteColor(color)}
+            style={[
+              styles.colorSwatch,
+              {backgroundColor: color},
+              noteColor === color && styles.colorSwatchActive,
+            ]}
+          />
+        ))}
+      </View>
+
+      {note?.labels && note.labels.length > 0 && (
+        <View style={styles.labelsRow}>
+          {note.labels.map(label => (
+            <Text key={label} style={styles.labelChip}>
+              #{label}
+            </Text>
+          ))}
+        </View>
+      )}
+
+      <View style={styles.typeRow}>
+        {(['text', 'checklist'] as NoteType[]).map(type => (
+          <Pressable
+            key={type}
+            onPress={() => setNoteType(type)}
+            style={[styles.typeChip, noteType === type && styles.typeChipActive]}>
+            <Text style={[styles.typeChipText, noteType === type && styles.typeChipTextActive]}>
+              {type === 'text' ? 'Text' : 'Checklist'}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
       <TextInput
         style={styles.titleInput}
         placeholder="Title"
@@ -154,14 +198,18 @@ export function EditNoteForm({
       />
 
       <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.input}
-          multiline
-          value={content}
-          onChangeText={setContent}
-          textAlignVertical="top"
-          selectionColor={colors.accent}
-        />
+        {noteType === 'checklist' ? (
+          <ChecklistEditor items={checklistItems} onChange={setChecklistItems} />
+        ) : (
+          <TextInput
+            style={styles.input}
+            multiline
+            value={content}
+            onChangeText={setContent}
+            textAlignVertical="top"
+            selectionColor={colors.accent}
+          />
+        )}
       </View>
 
       <View style={styles.footer}>
@@ -183,6 +231,7 @@ export function EditNoteForm({
         onSelectCategory={changeCategory}
         onConfirm={handleConfirmSave}
         onCancel={() => setIsModalVisible(false)}
+        confirmLabel="Save Changes"
       />
     </KeyboardAvoidingView>
   );
@@ -218,6 +267,75 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     marginTop: spacing.md,
     marginBottom: spacing.xs,
+  },
+  colorRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
+  },
+  colorSwatch: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  colorSwatchActive: {
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
+  colorClear: {
+    width: 'auto',
+    paddingHorizontal: spacing.sm,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceElevated,
+  },
+  colorClearText: {
+    color: colors.textSecondary,
+    fontSize: typography.caption.fontSize,
+  },
+  labelsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
+  },
+  labelChip: {
+    color: colors.accent,
+    fontSize: typography.caption.fontSize,
+    backgroundColor: colors.surfaceElevated,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.sm,
+  },
+  typeRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
+  },
+  typeChip: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  typeChipActive: {
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
+  },
+  typeChipText: {
+    color: colors.textSecondary,
+    fontSize: typography.caption.fontSize,
+    fontWeight: '600',
+  },
+  typeChipTextActive: {
+    color: colors.background,
   },
   appTitle: {
     fontSize: typography.h2.fontSize,

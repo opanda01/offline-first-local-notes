@@ -19,24 +19,6 @@ jest.mock('react-native-mmkv', () => {
   };
 });
 
-// Mock react-native-quick-crypto
-jest.mock('react-native-quick-crypto', () => {
-  return {
-    createCipheriv: jest.fn(() => ({
-      update: jest.fn(() => Buffer.from('mock-encrypted')),
-      final: jest.fn(() => Buffer.from('')),
-      getAuthTag: jest.fn(() => Buffer.from('mock-auth-tag')),
-    })),
-    createDecipheriv: jest.fn(() => ({
-      setAuthTag: jest.fn(),
-      update: jest.fn(() => Buffer.from('mock-decrypted')),
-      final: jest.fn(() => Buffer.from('')),
-    })),
-    pbkdf2Sync: jest.fn(() => Buffer.from('mock-derived-key')),
-    randomBytes: jest.fn(() => Buffer.from('1234567890123456')), // 16 bytes
-  };
-});
-
 // Mock react-native-fs
 jest.mock('react-native-fs', () => {
   return {
@@ -46,8 +28,6 @@ jest.mock('react-native-fs', () => {
   };
 });
 
-/* global Buffer */
-
 // Mock react-native-share
 jest.mock('react-native-share', () => ({
   open: jest.fn(() => Promise.resolve()),
@@ -55,6 +35,7 @@ jest.mock('react-native-share', () => ({
 
 // Mock DocumentPicker
 jest.mock('@react-native-documents/picker', () => ({
+  pick: jest.fn(() => Promise.resolve([{uri: 'mock-file-uri'}])),
   pickSingle: jest.fn(() => Promise.resolve({uri: 'mock-file-uri'})),
   isCancel: jest.fn(() => false),
   types: {

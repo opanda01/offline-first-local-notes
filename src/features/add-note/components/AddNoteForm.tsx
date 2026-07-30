@@ -2,16 +2,19 @@ import React, {useEffect, useRef, useState} from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   StyleSheet,
+  Text,
   TextInput,
   View,
-  Text,
 } from 'react-native';
 import {useAddNote} from '../model/useAddNote';
-import {CategorySelectionModal} from './CategorySelectionModal';
+import {CategorySelectionModal} from '@/features/category-management';
+import {ChecklistEditor} from '@/features/checklist-note';
 import {CharacterCounter} from './CharacterCounter';
 import {Button} from '@/shared/ui';
 import {colors, spacing, typography} from '@/shared/config';
+import type {NoteType} from '@/entities/note';
 
 interface AddNoteFormProps {
   onNoteSaved?: (noteId: string) => void;
@@ -29,6 +32,10 @@ export function AddNoteForm({
     setContent,
     selectedCategoryId,
     selectCategory,
+    noteType,
+    setNoteType,
+    checklistItems,
+    setChecklistItems,
     saveNote,
     resetForm,
     wordCount,
@@ -78,6 +85,19 @@ export function AddNoteForm({
         />
       </View>
 
+      <View style={styles.typeRow}>
+        {(['text', 'checklist'] as NoteType[]).map(type => (
+          <Pressable
+            key={type}
+            onPress={() => setNoteType(type)}
+            style={[styles.typeChip, noteType === type && styles.typeChipActive]}>
+            <Text style={[styles.typeChipText, noteType === type && styles.typeChipTextActive]}>
+              {type === 'text' ? 'Text' : 'Checklist'}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
       <TextInput
         style={styles.titleInput}
         placeholder="Title"
@@ -88,17 +108,21 @@ export function AddNoteForm({
       />
 
       <View style={styles.inputWrapper}>
-        <TextInput
-          ref={inputRef}
-          style={styles.input}
-          multiline
-          placeholder="Type something..."
-          placeholderTextColor={colors.textDisabled}
-          value={content}
-          onChangeText={setContent}
-          textAlignVertical="top"
-          selectionColor={colors.accent}
-        />
+        {noteType === 'checklist' ? (
+          <ChecklistEditor items={checklistItems} onChange={setChecklistItems} />
+        ) : (
+          <TextInput
+            ref={inputRef}
+            style={styles.input}
+            multiline
+            placeholder="Type something..."
+            placeholderTextColor={colors.textDisabled}
+            value={content}
+            onChangeText={setContent}
+            textAlignVertical="top"
+            selectionColor={colors.accent}
+          />
+        )}
       </View>
 
       <View style={styles.footer}>
@@ -133,6 +157,31 @@ const styles = StyleSheet.create({
     fontSize: typography.h2.fontSize,
     fontWeight: 'bold',
     color: colors.primary,
+  },
+  typeRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
+  },
+  typeChip: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  typeChipActive: {
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
+  },
+  typeChipText: {
+    color: colors.textSecondary,
+    fontSize: typography.caption.fontSize,
+    fontWeight: '600',
+  },
+  typeChipTextActive: {
+    color: colors.background,
   },
   categoryBadgeContainer: {
     flexDirection: 'row',

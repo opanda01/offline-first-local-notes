@@ -42,7 +42,8 @@ Built with React Native and TypeScript, this project follows the **Feature-Slice
 
 ### Offline-First, Privacy-First
 - **100% Offline:** No backend, no cloud, no analytics. All data is persisted locally on the device using MMKV.
-- **No Network Permissions:** The app does not request internet permission. Your notes never leave your phone.
+- **No app-initiated network usage:** The application logic does not perform sync or API calls. Your notes stay on the device unless you explicitly export an encrypted backup.
+- **Android `INTERNET` permission:** The release manifest may declare `INTERNET` because the React Native toolchain and some native modules expect it for development tooling; the Secret app code paths do not use it for note storage or sync. You can strip or document this for hardened release builds if required.
 
 ### Note Management
 - **Quick Capture:** Dedicated Capture tab for instantly creating notes with a title, content body, and category assignment.

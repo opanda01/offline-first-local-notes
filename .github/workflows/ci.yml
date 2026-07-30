@@ -30,6 +30,5 @@ jobs:
       - name: Lint Code
         run: npm run lint
 
-      # Example testing step - uncomment when tests are added
-      # - name: Run Tests
-      #   run: npm test -- --watchAll=false
+      - name: Run Tests
+        run: npm test -- --watchAll=false

@@ -1,45 +1,13 @@
-import React, {useCallback, useState} from 'react';
+import React, {useState} from 'react';
 import {StyleSheet, Text, View, ScrollView} from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
 import {ExportBackupButton, ImportBackupButton} from '@/features/backup-vault';
 import {CategoryManagerModal} from '@/widgets/category-manager';
-import {noteRepository, getWordCount, formatRelativeTime} from '@/entities/note';
-import {categoryRepository} from '@/entities/category';
+import {NoteStats} from '@/widgets/note-stats';
 import {colors, spacing, typography} from '@/shared/config';
 import {SettingsRow} from '@/shared/ui';
 
 export function SettingsPage(): React.JSX.Element {
   const [isCategoryModalVisible, setCategoryModalVisible] = useState(false);
-  const [stats, setStats] = useState({
-    noteCount: 0,
-    categoryCount: 0,
-    wordCount: 0,
-    lastUpdate: 0,
-  });
-
-  useFocusEffect(
-    useCallback(() => {
-      const notes = noteRepository.getAll();
-      const categories = categoryRepository.getAll();
-
-      const wordCount = notes.reduce(
-        (sum, note) => sum + getWordCount(note.content),
-        0,
-      );
-
-      const lastUpdate = notes.reduce(
-        (latest, note) => Math.max(latest, note.updatedAt),
-        0,
-      );
-
-      setStats({
-        noteCount: notes.length,
-        categoryCount: categories.length,
-        wordCount,
-        lastUpdate,
-      });
-    }, []),
-  );
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -50,27 +18,12 @@ export function SettingsPage(): React.JSX.Element {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Vault Details</Text>
         <View style={styles.card}>
-          <SettingsRow 
-            label="Manage Categories" 
-            value={stats.categoryCount} 
+          <SettingsRow
+            label="Manage Categories"
             icon="format-list-bulleted"
-            onPress={() => setCategoryModalVisible(true)} 
+            onPress={() => setCategoryModalVisible(true)}
           />
-          <SettingsRow 
-            label="Total Notes" 
-            value={stats.noteCount} 
-            icon="file-document-multiple-outline" 
-          />
-          <SettingsRow 
-            label="Total Words" 
-            value={stats.wordCount} 
-            icon="format-text" 
-          />
-          <SettingsRow 
-            label="Last Updated" 
-            value={stats.lastUpdate > 0 ? formatRelativeTime(stats.lastUpdate) : 'Never'} 
-            icon="clock-outline" 
-          />
+          <NoteStats variant="embedded" />
         </View>
       </View>
 
@@ -82,9 +35,9 @@ export function SettingsPage(): React.JSX.Element {
         </View>
       </View>
 
-      <CategoryManagerModal 
-        visible={isCategoryModalVisible} 
-        onClose={() => setCategoryModalVisible(false)} 
+      <CategoryManagerModal
+        visible={isCategoryModalVisible}
+        onClose={() => setCategoryModalVisible(false)}
       />
     </ScrollView>
   );

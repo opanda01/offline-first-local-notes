@@ -5,7 +5,12 @@ import {noteRepository, getWordCount, formatRelativeTime} from '@/entities/note'
 import {categoryRepository} from '@/entities/category';
 import {colors, spacing, borderRadius, typography} from '@/shared/config';
 
-export function NoteStats(): React.JSX.Element {
+interface NoteStatsProps {
+  /** When embedded, hides the section title for use inside Settings cards */
+  variant?: 'card' | 'embedded';
+}
+
+export function NoteStats({variant = 'card'}: NoteStatsProps): React.JSX.Element {
   const [stats, setStats] = useState({
     noteCount: 0,
     categoryCount: 0,
@@ -38,8 +43,8 @@ export function NoteStats(): React.JSX.Element {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Vault Statistics</Text>
+    <View style={variant === 'card' ? styles.container : styles.embeddedContainer}>
+      {variant === 'card' && <Text style={styles.title}>Vault Statistics</Text>}
       
       <View style={styles.row}>
         <Text style={styles.label}>Total Notes</Text>
@@ -74,6 +79,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: borderRadius.lg,
     padding: spacing.lg,
+  },
+  embeddedContainer: {
+    paddingHorizontal: spacing.sm,
+    paddingBottom: spacing.sm,
   },
   title: {
     fontSize: typography.h2.fontSize,

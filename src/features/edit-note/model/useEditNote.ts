@@ -1,5 +1,11 @@
 import {useState, useCallback, useEffect} from 'react';
-import {noteRepository, type Note} from '@/entities/note';
+import {
+  noteRepository,
+  syncChecklistContent,
+  type Note,
+  type NoteType,
+  type ChecklistItem,
+} from '@/entities/note';
 
 export interface UseEditNoteReturn {
   note: Note | null;
@@ -7,6 +13,12 @@ export interface UseEditNoteReturn {
   setTitle: (text: string) => void;
   content: string;
   setContent: (text: string) => void;
+  noteType: NoteType;
+  setNoteType: (type: NoteType) => void;
+  checklistItems: ChecklistItem[];
+  setChecklistItems: (items: ChecklistItem[]) => void;
+  noteColor?: string;
+  setNoteColor: (color: string | undefined) => void;
   categoryId: string | undefined;
   changeCategory: (categoryId: string | undefined) => void;
   saveChanges: () => {success: boolean; error?: string};
@@ -21,6 +33,9 @@ export function useEditNote(noteId: string): UseEditNoteReturn {
   const [note, setNote] = useState<Note | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [noteType, setNoteType] = useState<NoteType>('text');
+  const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
+  const [noteColor, setNoteColor] = useState<string | undefined>();
   const [categoryId, setCategoryId] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -30,6 +45,9 @@ export function useEditNote(noteId: string): UseEditNoteReturn {
       setNote(loadedNote);
       setTitle(loadedNote.title || '');
       setContent(loadedNote.content);
+      setNoteType(loadedNote.noteType ?? 'text');
+      setChecklistItems(loadedNote.checklistItems ?? []);
+      setNoteColor(loadedNote.color);
       setCategoryId(loadedNote.categoryId);
     }
     setIsLoading(false);
@@ -37,6 +55,31 @@ export function useEditNote(noteId: string): UseEditNoteReturn {
 
   const saveChanges = useCallback(() => {
     if (!note) return {success: false, error: 'Note not found'};
+
+    if (noteType === 'checklist') {
+      const filledItems = checklistItems.filter(item => item.text.trim().length > 0);
+      if (filledItems.length === 0) {
+        return {success: false, error: 'Add at least one checklist item'};
+      }
+      try {
+        const updated = noteRepository.update(noteId, {
+          title: title.trim() || undefined,
+          content: syncChecklistContent(filledItems),
+          noteType: 'checklist',
+          checklistItems: filledItems,
+          categoryId,
+          color: noteColor,
+        });
+        if (updated) {
+          setNote(updated);
+          return {success: true};
+        }
+        return {success: false, error: 'Failed to update note'};
+      } catch {
+        return {success: false, error: 'Unknown error'};
+      }
+    }
+
     const trimmed = content.trim();
     if (!trimmed) return {success: false, error: 'Content cannot be empty'};
 
@@ -44,7 +87,9 @@ export function useEditNote(noteId: string): UseEditNoteReturn {
       const updated = noteRepository.update(noteId, {
         title: title.trim() || undefined,
         content: trimmed,
+        noteType: 'text',
         categoryId,
+        color: noteColor,
       });
       if (updated) {
         setNote(updated);
@@ -54,7 +99,7 @@ export function useEditNote(noteId: string): UseEditNoteReturn {
     } catch {
       return {success: false, error: 'Unknown error'};
     }
-  }, [note, noteId, title, content, categoryId]);
+  }, [note, noteId, title, content, noteType, checklistItems, categoryId, noteColor]);
 
   const deleteNote = useCallback(() => {
     return noteRepository.delete(noteId);
@@ -76,7 +121,14 @@ export function useEditNote(noteId: string): UseEditNoteReturn {
     if (updated) setNote(updated);
   }, [note, noteId]);
 
-  const hasChanges = note ? title !== (note.title || '') || content !== note.content || categoryId !== note.categoryId : false;
+  const hasChanges = note
+    ? title !== (note.title || '') ||
+      content !== note.content ||
+      categoryId !== note.categoryId ||
+      noteColor !== note.color ||
+      noteType !== (note.noteType ?? 'text') ||
+      JSON.stringify(checklistItems) !== JSON.stringify(note.checklistItems ?? [])
+    : false;
 
   return {
     note,
@@ -84,6 +136,12 @@ export function useEditNote(noteId: string): UseEditNoteReturn {
     setTitle,
     content,
     setContent,
+    noteType,
+    setNoteType,
+    checklistItems,
+    setChecklistItems,
+    noteColor,
+    setNoteColor,
     categoryId,
     changeCategory: setCategoryId,
     saveChanges,

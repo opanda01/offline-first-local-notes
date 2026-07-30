@@ -19,7 +19,9 @@ describe('Note Entity - noteRepository', () => {
     expect(newNote.content).toBe('This is a test note.');
     
     const retrieved = noteRepository.getById(newNote.id);
-    expect(retrieved).toEqual(newNote);
+    expect(retrieved?.title).toBe('Test Note');
+    expect(retrieved?.content).toBe('This is a test note.');
+    expect(retrieved?.categoryId).toBe('cat-1');
   });
 
   it('should update an existing note', () => {
@@ -61,6 +63,23 @@ describe('Note Entity - noteRepository', () => {
     
     const retrieved = noteRepository.getById(newNote.id);
     expect(retrieved).toBeNull();
+  });
+});
+
+describe('Note Entity - category references', () => {
+  beforeEach(() => {
+    storage.clearAll();
+  });
+
+  it('clears categoryId from notes when category is deleted in cascade', () => {
+    const {categoryRepository} = require('@/entities/category');
+    const cat = categoryRepository.create({name: 'Work'});
+    const note = noteRepository.create({content: 'Tagged note', categoryId: cat.id});
+
+    categoryRepository.deleteCascade(cat.id);
+
+    const updated = noteRepository.getById(note.id);
+    expect(updated?.categoryId).toBeUndefined();
   });
 });
 

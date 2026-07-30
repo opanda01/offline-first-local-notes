@@ -2,7 +2,7 @@ module.exports = {
   preset: 'react-native',
   setupFiles: ['<rootDir>/jest.setup.js'],
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-vector-icons)/)',
+    'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-vector-icons|react-native-tab-view|react-native-pager-view|react-native-safe-area-context|react-native-screens)/)',
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',

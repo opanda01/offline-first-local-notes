@@ -1,6 +1,6 @@
 /**
- * Add Note Feature — Category Picker UI
- * @module features/add-note
+ * Category Management — hierarchical category picker with inline CRUD
+ * @module features/category-management
  */
 
 import React, {useEffect, useState} from 'react';
@@ -56,14 +56,14 @@ export function CategoryPicker({selectedId, onSelect, visible}: CategoryPickerPr
   const handleDeleteCategory = (cat: Category) => {
     Alert.alert(
       'Delete Category',
-      `Are you sure you want to delete "${cat.name}"?`,
+      `Delete "${cat.name}" and subcategories? Notes in these categories become uncategorized.`,
       [
         {text: 'Cancel', style: 'cancel'},
         {
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            categoryRepository.delete(cat.id);
+            categoryRepository.deleteCascade(cat.id);
             if (selectedId === cat.id) {
               onSelect(undefined);
             }
@@ -86,7 +86,7 @@ export function CategoryPicker({selectedId, onSelect, visible}: CategoryPickerPr
           value={newCategoryName}
           onChangeText={setNewCategoryName}
           onSubmitEditing={() => handleAddCategory(parentId)}
-          placeholder={parentId ? "Subcategory name..." : "List name..."}
+          placeholder={parentId ? 'Subcategory name...' : 'List name...'}
           placeholderTextColor={colors.textDisabled}
           autoFocus
         />
@@ -109,11 +109,11 @@ export function CategoryPicker({selectedId, onSelect, visible}: CategoryPickerPr
     return (
       <View key={cat.id}>
         <View style={[styles.itemRow, {marginLeft: level * spacing.lg}]}>
-          <Pressable 
+          <Pressable
             onPress={() => toggleExpand(cat.id)}
             style={styles.expandIconContainer}>
             {hasChildren ? (
-              <Icon name={isExpanded ? "chevron-down" : "chevron-right"} size="sm" color={colors.textSecondary} />
+              <Icon name={isExpanded ? 'chevron-down' : 'chevron-right'} size="sm" color={colors.textSecondary} />
             ) : (
               <View style={styles.expandIconPlaceholder} />
             )}
@@ -136,8 +136,7 @@ export function CategoryPicker({selectedId, onSelect, visible}: CategoryPickerPr
               {cat.name}
             </Text>
           </Pressable>
-          
-          {/* Add Subcategory Button (visible only if parent is selected to avoid clutter) */}
+
           {isSelected && addingParentId !== cat.id && (
              <Pressable
                onPress={() => {
@@ -168,8 +167,7 @@ export function CategoryPicker({selectedId, onSelect, visible}: CategoryPickerPr
       <ScrollView
         showsVerticalScrollIndicator={true}
         contentContainerStyle={styles.scrollContent}>
-        
-        {/* "No Category" chip */}
+
         <Pressable
           onPress={() => onSelect(undefined)}
           style={[styles.chip, !selectedId && styles.chipSelected, {marginBottom: spacing.sm}]}>
@@ -178,10 +176,8 @@ export function CategoryPicker({selectedId, onSelect, visible}: CategoryPickerPr
           </Text>
         </Pressable>
 
-        {/* Root Categories */}
         {rootCategories.map(cat => renderCategory(cat, 0))}
 
-        {/* Add Root Category */}
         {addingParentId === 'root' ? (
           renderAddInput(undefined)
         ) : (
@@ -201,7 +197,7 @@ export function CategoryPicker({selectedId, onSelect, visible}: CategoryPickerPr
 
 const styles = StyleSheet.create({
   container: {
-    maxHeight: 300, // Limiting height since it's vertical now
+    maxHeight: 300,
   },
   scrollContent: {
     paddingHorizontal: spacing.sm,
@@ -220,7 +216,7 @@ const styles = StyleSheet.create({
     marginLeft: spacing.lg,
   },
   chip: {
-    flex: 1, // Take available space
+    flex: 1,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.md,
@@ -273,12 +269,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceElevated,
     borderWidth: 1,
     borderColor: colors.border,
-  },
-  addSubBtnText: {
-    color: colors.accent,
-    fontSize: 10,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
   },
   expandIconContainer: {
     width: 24,

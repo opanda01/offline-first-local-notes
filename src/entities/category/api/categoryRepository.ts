@@ -6,6 +6,8 @@
 import {storage} from '@/shared/lib/mmkv-storage';
 import type {Category, CreateCategoryDTO, UpdateCategoryDTO} from '../model/types';
 import {generateCategoryId, getNextColor} from '../lib/categoryHelpers';
+import {collectCategorySubtreeIds} from '../lib/categoryTreeHelpers';
+import {noteRepository} from '@/entities/note';
 
 const CATEGORIES_KEY_PREFIX = 'category:';
 const CATEGORY_INDEX_KEY = 'category:__index__';
@@ -82,6 +84,20 @@ export const categoryRepository = {
     );
 
     return true;
+  },
+
+  /** Alt kategorilerle birlikte sil; ilgili notların categoryId alanını temizler */
+  deleteCascade(id: string): boolean {
+    const all = this.getAll();
+    const idsToRemove = collectCategorySubtreeIds(id, all);
+    noteRepository.clearCategoryIds(idsToRemove);
+    let deletedAny = false;
+    for (const categoryId of idsToRemove) {
+      if (this.delete(categoryId)) {
+        deletedAny = true;
+      }
+    }
+    return deletedAny;
   },
 
   /** Kategorileri yeniden sırala */

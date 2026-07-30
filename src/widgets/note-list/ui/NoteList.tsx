@@ -1,14 +1,13 @@
 import React, {useCallback, useState} from 'react';
 import {StyleSheet, Alert, TouchableOpacity, View, ScrollView, Dimensions, FlatList} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
-import {noteRepository, type Note, type NoteSortOptions} from '@/entities/note';
+import {noteRepository, type Note, type NoteSortOptions, type VaultListFilter} from '@/entities/note';
 import {categoryRepository} from '@/entities/category';
 import {EmptyState, Icon} from '@/shared/ui';
 import {colors, spacing, borderRadius} from '@/shared/config';
 import {NoteCard} from '../components/NoteCard';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
-// Padding is spacing.md (16) on both sides = 32
 const LIST_PADDING = spacing.md * 2;
 const ROW_WIDTH = SCREEN_WIDTH - LIST_PADDING;
 const DELETE_BTN_WIDTH = 80;
@@ -16,6 +15,7 @@ const DELETE_BTN_WIDTH = 80;
 interface NoteListProps {
   categoryId?: string;
   searchQuery?: string;
+  listFilter?: VaultListFilter;
   onNotePress: (noteId: string) => void;
   sortOptions?: NoteSortOptions;
 }
@@ -23,6 +23,7 @@ interface NoteListProps {
 export function NoteList({
   categoryId,
   searchQuery,
+  listFilter = 'all',
   onNotePress,
   sortOptions,
 }: NoteListProps): React.JSX.Element {
@@ -30,13 +31,15 @@ export function NoteList({
 
   useFocusEffect(
     useCallback(() => {
-      let fetchedNotes = noteRepository.getAll(sortOptions);
+      let fetchedNotes = searchQuery?.trim()
+        ? noteRepository.search(searchQuery.trim())
+        : noteRepository.getAll(sortOptions);
 
       if (categoryId) {
         const allCategories = categoryRepository.getAll();
         const validCategoryIds = new Set<string>();
         const queue = [categoryId];
-        
+
         while (queue.length > 0) {
           const currentId = queue.shift()!;
           validCategoryIds.add(currentId);
@@ -47,16 +50,12 @@ export function NoteList({
         fetchedNotes = fetchedNotes.filter(n => n.categoryId && validCategoryIds.has(n.categoryId));
       }
 
-      if (searchQuery) {
-        const lowerQuery = searchQuery.toLowerCase();
-        fetchedNotes = fetchedNotes.filter(
-          n =>
-            n.title.toLowerCase().includes(lowerQuery) ||
-            n.content.toLowerCase().includes(lowerQuery),
-        );
+      if (listFilter === 'pinned') {
+        fetchedNotes = fetchedNotes.filter(n => n.isPinned);
+      } else if (listFilter === 'favorites') {
+        fetchedNotes = fetchedNotes.filter(n => n.isFavorite);
       }
 
-      // Pinned notes on top
       fetchedNotes.sort((a, b) => {
         if (a.isPinned && !b.isPinned) return -1;
         if (!a.isPinned && b.isPinned) return 1;
@@ -64,7 +63,7 @@ export function NoteList({
       });
 
       setNotes(fetchedNotes);
-    }, [categoryId, searchQuery, sortOptions]),
+    }, [categoryId, searchQuery, listFilter, sortOptions]),
   );
 
   const handleDeleteAttempt = (note: Note) => {

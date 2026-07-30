@@ -5,7 +5,7 @@
 
 import {storage} from '@/shared/lib/mmkv-storage';
 import type {Note, CreateNoteDTO, UpdateNoteDTO, NoteSortOptions} from '../model/types';
-import {generateNoteId, extractTitle, sortNotes} from '../lib/noteHelpers';
+import {generateNoteId, extractTitle, sortNotes, normalizeNote, extractLabelsFromText, syncChecklistContent} from '../lib/noteHelpers';
 
 const NOTES_KEY_PREFIX = 'note:';
 const NOTE_INDEX_KEY = 'note:__index__';
@@ -23,16 +23,29 @@ export const noteRepository = {
   /** Yeni not oluştur */
   create(dto: CreateNoteDTO): Note {
     const now = Date.now();
-    const note: Note = {
+    const noteType = dto.noteType ?? 'text';
+    const checklistItems = dto.checklistItems;
+    const labels =
+      dto.labels ?? extractLabelsFromText(`${dto.title ?? ''}\n${dto.content}`);
+    const content =
+      noteType === 'checklist' && checklistItems
+        ? syncChecklistContent(checklistItems)
+        : dto.content;
+
+    const note: Note = normalizeNote({
       id: generateNoteId(),
-      title: dto.title || extractTitle(dto.content),
-      content: dto.content,
+      title: dto.title || extractTitle(content),
+      content,
+      noteType,
+      checklistItems,
+      color: dto.color,
+      labels,
       categoryId: dto.categoryId,
       createdAt: now,
       updatedAt: now,
       isFavorite: false,
       isPinned: false,
-    };
+    });
 
     // Notu kaydet
     storage.set<Note>(`${NOTES_KEY_PREFIX}${note.id}`, note);
@@ -47,7 +60,8 @@ export const noteRepository = {
 
   /** ID ile not getir */
   getById(id: string): Note | null {
-    return storage.get<Note>(`${NOTES_KEY_PREFIX}${id}`);
+    const raw = storage.get<Note>(`${NOTES_KEY_PREFIX}${id}`);
+    return raw ? normalizeNote(raw) : null;
   },
 
   /** Tüm notları getir (sıralı) */
@@ -55,7 +69,8 @@ export const noteRepository = {
     const index = storage.get<string[]>(NOTE_INDEX_KEY) || [];
     const notes = index
       .map(id => storage.get<Note>(`${NOTES_KEY_PREFIX}${id}`))
-      .filter((n): n is Note => n !== null);
+      .filter((n): n is Note => n !== null)
+      .map(normalizeNote);
 
     return sortNotes(notes, sort);
   },
@@ -68,13 +83,35 @@ export const noteRepository = {
     // Yalnızca başlık veya içerik gerçekten değiştiyse tarihi güncelle
     const titleChanged = dto.title !== undefined && dto.title !== existing.title;
     const contentChanged = dto.content !== undefined && dto.content !== existing.content;
-    const shouldUpdateTimestamp = titleChanged || contentChanged;
+    const checklistChanged =
+      dto.checklistItems !== undefined &&
+      JSON.stringify(dto.checklistItems) !== JSON.stringify(existing.checklistItems);
+    const shouldUpdateTimestamp = titleChanged || contentChanged || checklistChanged;
 
-    const updated: Note = {
+    const mergedLabels =
+      dto.labels ??
+      extractLabelsFromText(
+        `${dto.title ?? existing.title}\n${dto.content ?? existing.content}`,
+      );
+
+    const nextType = dto.noteType ?? existing.noteType ?? 'text';
+    const nextChecklist = dto.checklistItems ?? existing.checklistItems;
+    const nextContent =
+      dto.content !== undefined
+        ? dto.content
+        : nextType === 'checklist' && nextChecklist
+          ? syncChecklistContent(nextChecklist)
+          : existing.content;
+
+    const updated: Note = normalizeNote({
       ...existing,
       ...dto,
+      content: nextContent,
+      noteType: nextType,
+      checklistItems: nextChecklist,
+      labels: mergedLabels,
       updatedAt: shouldUpdateTimestamp ? Date.now() : existing.updatedAt,
-    };
+    });
 
     storage.set<Note>(`${NOTES_KEY_PREFIX}${id}`, updated);
     return updated;
@@ -100,14 +137,37 @@ export const noteRepository = {
     return this.getAll().filter(n => n.categoryId === categoryId);
   },
 
-  /** Metin araması (basit contains) */
+  /** Metin araması (başlık, içerik, etiketler, checklist maddeleri) */
   search(query: string): Note[] {
-    const lowerQuery = query.toLowerCase();
-    return this.getAll().filter(
-      n =>
-        n.title.toLowerCase().includes(lowerQuery) ||
-        n.content.toLowerCase().includes(lowerQuery),
-    );
+    const lowerQuery = query.toLowerCase().trim();
+    if (!lowerQuery) return this.getAll();
+
+    return this.getAll().filter(n => {
+      if (n.title.toLowerCase().includes(lowerQuery)) return true;
+      if (n.content.toLowerCase().includes(lowerQuery)) return true;
+      if (n.labels?.some(label => label.toLowerCase().includes(lowerQuery))) {
+        return true;
+      }
+      if (
+        n.checklistItems?.some(item => item.text.toLowerCase().includes(lowerQuery))
+      ) {
+        return true;
+      }
+      return false;
+    });
+  },
+
+  /** Verilen kategori id'lerine bağlı notların categoryId alanını temizler */
+  clearCategoryIds(categoryIds: string[]): void {
+    const idSet = new Set(categoryIds);
+    const index = storage.get<string[]>(NOTE_INDEX_KEY) || [];
+    for (const noteId of index) {
+      const note = storage.get<Note>(`${NOTES_KEY_PREFIX}${noteId}`);
+      if (note?.categoryId && idSet.has(note.categoryId)) {
+        const updated = normalizeNote({...note, categoryId: undefined});
+        storage.set(`${NOTES_KEY_PREFIX}${noteId}`, updated);
+      }
+    }
   },
 
   /** Not sayısını getir */

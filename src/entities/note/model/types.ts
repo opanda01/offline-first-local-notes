@@ -3,6 +3,15 @@
  * @module entities/note
  */
 
+export type NoteType = 'text' | 'checklist';
+
+export interface ChecklistItem {
+  id: string;
+  text: string;
+  checked: boolean;
+  indentLevel?: number;
+}
+
 export interface Note {
   /** Benzersiz tanımlayıcı (UUID v4 formatı veya benzeri) */
   id: string;
@@ -12,6 +21,18 @@ export interface Note {
 
   /** Not içeriği (plaintext) */
   content: string;
+
+  /** Metin veya checklist notu */
+  noteType?: NoteType;
+
+  /** Checklist maddeleri (noteType === 'checklist') */
+  checklistItems?: ChecklistItem[];
+
+  /** Not kart rengi (hex) */
+  color?: string;
+
+  /** Keep-style #etiketler */
+  labels?: string[];
 
   /** Kategori ID'si (opsiyonel) */
   categoryId?: string;
@@ -30,10 +51,34 @@ export interface Note {
 }
 
 /** Not oluşturmak için gerekli minimum veri */
-export type CreateNoteDTO = Pick<Note, 'content'> & Partial<Pick<Note, 'title' | 'categoryId'>>;
+export type CreateNoteDTO = Pick<Note, 'content'> &
+  Partial<
+    Pick<
+      Note,
+      | 'title'
+      | 'categoryId'
+      | 'noteType'
+      | 'checklistItems'
+      | 'color'
+      | 'labels'
+    >
+  >;
 
 /** Not güncellemek için izin verilen alanlar */
-export type UpdateNoteDTO = Partial<Pick<Note, 'title' | 'content' | 'categoryId' | 'isFavorite' | 'isPinned'>>;
+export type UpdateNoteDTO = Partial<
+  Pick<
+    Note,
+    | 'title'
+    | 'content'
+    | 'categoryId'
+    | 'isFavorite'
+    | 'isPinned'
+    | 'noteType'
+    | 'checklistItems'
+    | 'color'
+    | 'labels'
+  >
+>;
 
 /** Not sıralama seçenekleri */
 export type NoteSortField = 'createdAt' | 'updatedAt' | 'title';
@@ -43,3 +88,5 @@ export interface NoteSortOptions {
   field: NoteSortField;
   direction: SortDirection;
 }
+
+export type VaultListFilter = 'all' | 'pinned' | 'favorites';

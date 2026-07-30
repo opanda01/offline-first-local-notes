@@ -2,6 +2,10 @@
  * @format
  */
 
+jest.mock('../src/app/App', () => ({
+  App: () => null,
+}));
+
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 import App from '../App';

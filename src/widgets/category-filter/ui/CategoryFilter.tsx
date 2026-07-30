@@ -33,7 +33,7 @@ export function CategoryFilter({
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            categoryRepository.delete(cat.id);
+            categoryRepository.deleteCascade(cat.id);
             if (selectedCategoryId === cat.id) {
               onSelectCategory(undefined);
             }

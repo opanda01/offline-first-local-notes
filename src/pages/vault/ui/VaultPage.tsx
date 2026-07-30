@@ -1,13 +1,15 @@
 import React, {useState, useCallback} from 'react';
 import {View, StyleSheet, Text} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {NoteList, CategoryFilter, SearchBar} from '@/widgets';
+import {NoteList, CategoryFilter, SearchBar, VaultQuickFilters} from '@/widgets';
 import {colors, spacing, typography} from '@/shared/config';
+import type {VaultListFilter} from '@/entities/note';
 
 export function VaultPage(): React.JSX.Element {
   const navigation = useNavigation<any>();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>();
+  const [listFilter, setListFilter] = useState<VaultListFilter>('all');
 
   const handleNotePress = useCallback(
     (noteId: string) => {
@@ -31,6 +33,7 @@ export function VaultPage(): React.JSX.Element {
       </View>
 
       <View style={styles.filterContainer}>
+        <VaultQuickFilters activeFilter={listFilter} onChange={setListFilter} />
         <CategoryFilter
           selectedCategoryId={selectedCategoryId}
           onSelectCategory={setSelectedCategoryId}
@@ -41,6 +44,7 @@ export function VaultPage(): React.JSX.Element {
         <NoteList
           categoryId={selectedCategoryId}
           searchQuery={searchQuery}
+          listFilter={listFilter}
           onNotePress={handleNotePress}
         />
       </View>

@@ -23,7 +23,11 @@ export function NoteCard({note, onPress, onLongPress}: NoteCardProps): React.JSX
       accessibilityLabel={`Note titled ${note.title}, updated on ${formatRelativeTime(note.updatedAt)}`}
       style={({pressed}) => [
         styles.card,
-        {borderLeftColor: category?.color || 'transparent'},
+        {
+          borderLeftColor:
+            note.color || category?.color || 'transparent',
+          backgroundColor: note.color ? `${note.color}22` : colors.surface,
+        },
         pressed && styles.pressed,
       ]}>
       <View style={styles.header}>
@@ -47,8 +51,17 @@ export function NoteCard({note, onPress, onLongPress}: NoteCardProps): React.JSX
         </View>
       </View>
       <Text style={styles.preview} numberOfLines={2}>
-        {getContentPreview(note.content, 120)}
+        {getContentPreview(note, 120)}
       </Text>
+      {note.labels && note.labels.length > 0 && (
+        <View style={styles.labelsRow}>
+          {note.labels.slice(0, 4).map(label => (
+            <Text key={label} style={styles.labelChip}>
+              #{label}
+            </Text>
+          ))}
+        </View>
+      )}
       <View style={styles.footer}>
         {note.createdAt !== note.updatedAt ? (
           <Text style={styles.editedDate}>Edited {formatRelativeTime(note.updatedAt)}</Text>
@@ -105,6 +118,17 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: typography.body.fontSize,
     lineHeight: typography.body.lineHeight,
+  },
+  labelsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+    marginTop: spacing.xs,
+  },
+  labelChip: {
+    color: colors.accent,
+    fontSize: 10,
+    fontWeight: '600',
   },
   footer: {
     marginTop: spacing.sm,

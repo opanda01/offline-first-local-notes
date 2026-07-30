@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Modal, StyleSheet, View, Text, Pressable, SafeAreaView} from 'react-native';
-import {CategoryPicker} from '@/features/add-note/components/CategoryPicker';
+import {CategoryPicker} from '@/features/category-management';
 import {colors, spacing, typography} from '@/shared/config';
 import {Icon} from '@/shared/ui';
 

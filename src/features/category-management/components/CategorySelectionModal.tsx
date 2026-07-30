@@ -10,6 +10,7 @@ interface CategorySelectionModalProps {
   onSelectCategory: (id: string | undefined) => void;
   onConfirm: () => void;
   onCancel: () => void;
+  confirmLabel?: string;
 }
 
 export function CategorySelectionModal({
@@ -18,6 +19,7 @@ export function CategorySelectionModal({
   onSelectCategory,
   onConfirm,
   onCancel,
+  confirmLabel = 'Save Note',
 }: CategorySelectionModalProps): React.JSX.Element {
   return (
     <Modal
@@ -30,7 +32,7 @@ export function CategorySelectionModal({
           <TouchableWithoutFeedback onPress={() => {}}>
             <View style={styles.dialog}>
               <Text style={styles.title}>Select Category</Text>
-              
+
               <View style={styles.pickerContainer}>
                 <CategoryPicker
                   selectedId={selectedCategoryId}
@@ -41,7 +43,7 @@ export function CategorySelectionModal({
 
               <View style={styles.actions}>
                 <Button label="Cancel" variant="ghost" onPress={onCancel} />
-                <Button label="Save Note" variant="primary" onPress={onConfirm} />
+                <Button label={confirmLabel} variant="primary" onPress={onConfirm} />
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -79,7 +81,6 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     marginBottom: spacing.xl,
-    // Add negative margin to allow CategoryPicker's ScrollView to span full width of the dialog
     marginHorizontal: -spacing.lg,
   },
   actions: {

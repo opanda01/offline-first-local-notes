@@ -1,2 +1,4 @@
-// FSD features layer: user-action modules will be re-exported here when implemented.
-export {};
+export {AddNoteForm, useAddNote} from './add-note';
+export {CategoryPicker, CategorySelectionModal} from './category-management';
+export {ExportBackupButton, ImportBackupButton} from './backup-vault';
+export {ChecklistEditor} from './checklist-note';

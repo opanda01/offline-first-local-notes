@@ -2,8 +2,6 @@ import {cryptoService} from '../crypto';
 
 describe('Shared - Crypto Library', () => {
   it('should encrypt and decrypt a string securely', () => {
-    // Note: In our test environment, 'react-native-quick-crypto' is mocked
-    // to return static buffers for deterministic testing without native bridges.
     const plaintext = 'Super secret note content';
     const password = 'my-secure-password';
 
@@ -12,10 +10,24 @@ describe('Shared - Crypto Library', () => {
     expect(encrypted.ciphertext).toBeDefined();
     expect(encrypted.iv).toBeDefined();
     expect(encrypted.salt).toBeDefined();
-    expect(encrypted.authTag).toBeDefined();
+    expect(encrypted.algorithm).toBe('aes-256-cbc');
+    expect(encrypted.version).toBe(2);
 
-    // Since we mocked it, the decrypt will return our mocked decrypted buffer
     const decrypted = cryptoService.decrypt(encrypted, password);
-    expect(decrypted).toBe('mock-decrypted');
+    expect(decrypted).toBe(plaintext);
+  });
+
+  it('should fail decryption with wrong password', () => {
+    const encrypted = cryptoService.encrypt('secret', 'correct-password');
+    expect(() => cryptoService.decrypt(encrypted, 'wrong-password')).toThrow(
+      'Decryption failed',
+    );
+  });
+
+  it('should produce different ciphertext for same plaintext', () => {
+    const a = cryptoService.encrypt('same', 'pass');
+    const b = cryptoService.encrypt('same', 'pass');
+    expect(a.ciphertext).not.toBe(b.ciphertext);
+    expect(a.iv).not.toBe(b.iv);
   });
 });

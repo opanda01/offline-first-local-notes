@@ -11,6 +11,9 @@ export type {
   NoteSortOptions,
   NoteSortField,
   SortDirection,
+  NoteType,
+  ChecklistItem,
+  VaultListFilter,
 } from './model/types';
 
 // Repository
@@ -24,4 +27,9 @@ export {
   formatRelativeTime,
   getContentPreview,
   getWordCount,
+  normalizeNote,
+  extractLabelsFromText,
+  syncChecklistContent,
+  parseChecklistFromContent,
+  NOTE_COLOR_PALETTE,
 } from './lib/noteHelpers';
