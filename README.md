@@ -404,7 +404,7 @@ This repository is set up for long periods without manual maintenance: Dependabo
 |----------|------|----------------|
 | **CI** | `.github/workflows/ci.yml` | Every push and PR to `main` — `npm ci`, TypeScript, ESLint, Jest (`build-and-test`) |
 | **Build Android APK** | `.github/workflows/android-build.yml` | After merge to `main` only (path filters; skips docs/Gemfile-only/.github-only changes); manual dispatch |
-| **Dependabot auto-merge** | `.github/workflows/dependabot-auto-merge.yml` | Dependabot PRs — enables auto-merge for **direct** patch/minor updates after checks pass |
+| **Dependabot auto-merge** | `.github/workflows/dependabot-auto-merge.yml` | Dependabot PRs — syncs branch with `main` if behind, then enables auto-merge for **direct** patch/minor updates when checks pass |
 | **CodeQL** | `.github/workflows/codeql.yml` | Push/PR to `main` and weekly schedule — security analysis for JavaScript/TypeScript |
 
 ### Download a release APK from CI

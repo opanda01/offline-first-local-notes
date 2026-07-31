@@ -7,6 +7,10 @@ permissions:
   pull-requests: write
   contents: write
 
+concurrency:
+  group: dependabot-auto-merge-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   dependabot:
     runs-on: ubuntu-latest
@@ -17,6 +21,24 @@ jobs:
         uses: dependabot/fetch-metadata@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync Dependabot branch with main when behind
+        if: |
+          startsWith(steps.metadata.outputs.dependency-type, 'direct') &&
+          steps.metadata.outputs.update-type != 'version-update:semver-major' &&
+          (
+            steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
+            steps.metadata.outputs.update-type == 'version-update:semver-minor' ||
+            steps.metadata.outputs.update-type == ''
+          )
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          STATUS=$(gh pr view "$PR_NUMBER" --json mergeStateStatus -q .mergeStateStatus)
+          if [ "$STATUS" = "BEHIND" ]; then
+            gh pr update-branch "$PR_NUMBER"
+          fi
 
       - name: Enable auto-merge for direct patch/minor updates
         if: |
